@@ -1,0 +1,24 @@
+{
+  "name": "satire",
+  "version": "1.0.0-alpha.0",
+  "description": "Intelligent mocking with a purpose",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/**/*-test.js"
+  },
+  "keywords": [
+    "mock",
+    "API",
+    "http"
+  ],
+  "author": "Aaron Madsen <amadsen@codifiant.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "tape": "^4.6.3"
+  },
+  "dependencies": {
+    "chokidar": "^1.7.0",
+    "configr8": "^1.0.0-alpha.7",
+    "try-require": "^1.2.1"
+  }
+}
