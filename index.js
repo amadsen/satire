@@ -6,75 +6,35 @@
 + optional proxy to actual APIs
 */
 
-const http = require('http');
-const path = require('path');
-const chokidar = require('chokidar');
 const configr8 = require('configr8');
-const tryRequire = require('try-require');
+
+const watchMocks = require('./lib/watch-mocks.js');
+const httpServer = require('./lib/http-server');
 
 const defaultSettings = {
     port: 0,
-    mocks: '{test/,}mocks/**/*',
-    watch: true
+    mocks: '{test/,}mocks/**/*'
 }
 
 function satire({argv, settings}) {
+    const server = httpServer();
     /*
     Get config
     */
-    const config = configr8({
+    configr8({
         name: 'satire',
         useEnv: true,
-        useArgv: (true === argv),
-        usePkg: true
-    })(defaultSettings, settings);
-
-    /*
-    Watch mock directories
-    */
-    const mocks = {};
-    const mockGlobs = [].concat(mocks)
-        .map((glob) => {
-            return path.isAbsolute(glob)?
-                glob :
-                path.posix.join(process.cwd(), glob);
-        });
-    const watcher = chokidar.watch(
-        mockGlobs,
-        {
-            ignored: /(^|[\/\\])\../,
-            cwd: process.cwd()
-        }
-    ).on('all', (event, path) => {
-        /*
-        TODO: debounce this, because multiple events fire when a file is changed
-        */
-        // regardless of what happened, if we got a path
-        // try reloading it.
-        // first clear the require cache
-        delete require.cache[require.resolve(path)];
-        let aMock = tryRequire(path, require);
-
-        if(aMock){
-            mocks[path] = aMock;
-        } else {
-            let err = tryRequire.lastError();
-            if (err.code !== "MODULE_NOT_FOUND") {
-                /* TODO: optional logger */
-                console.error(err);
-            } else {
-                // remove any previous mock from the cache
-                delete mocks[path];
-            }
-        }
+        useArgv: !(false === argv || Array.isArray(argv)),
+        usePkg: true,
+        async: true
+    })(defaultSettings, settings)
+    .then(watchMocks)
+    .then(server.init)
+    .catch((err) => {
+        setImmediate(server.emit, 'error', err);
     });
 
-    /*
-    TODO: set up server
-    */
-    watcher.on('ready', () => {
-        //
-    });
+    return server.server;
 }
 
 module.exports = satire;
