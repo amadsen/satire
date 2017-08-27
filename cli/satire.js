@@ -20,4 +20,8 @@ const server = satire({ argv: true })
                 const [sec, nano] = process.hrtime(start);
                 console.log(`Completed request for ${req.url} in ${sec}s ${nano/1000000}ms`);
             });
+    })
+    .on('error', (err) => {
+        console.error('\n\nERROR:', err);
+        process.exit(1);
     });

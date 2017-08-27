@@ -13,7 +13,11 @@ const httpServer = require('./lib/http-server');
 
 const defaultSettings = {
     port: 0,
-    mocks: '{test/,}mocks/**/*'
+    mocks: [
+        './mocks/**/*',
+        './test/mocks/**/*'
+    ],
+    logger: console
 }
 
 function satire({argv, settings}) {
