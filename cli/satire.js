@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+const errorHandler = (err) => {
+    console.error(err);
+    console.error(err.stack);
+    process.exit(1);
+}
+process.on('unhandledRejection', errorHandler);
+process.on('uncaughtException', errorHandler);
 
 const satire = require('../');
 const server = satire({ argv: true })
