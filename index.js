@@ -32,6 +32,10 @@ function satire({argv, settings}) {
         usePkg: true,
         async: true
     })(defaultSettings, settings)
+    .then((config) => {
+        server.server.emit('config', config);
+        return Object.assign(config, { emit: (...args) => server.server.emit(...args) })
+    })
     .then(watchMocks)
     .then(server.init)
     .catch((err) => {

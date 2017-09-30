@@ -9,23 +9,25 @@ process.on('uncaughtException', errorHandler);
 
 const satire = require('../');
 const server = satire({ argv: true })
+    .on('mock-globs', (globs) => console.log(`Mock globs: ${JSON.stringify(globs, null, 2)}`) )
     .on('listening', (err) => {
         const {
             port
         } = server.address();
         console.log(`Listening on ${port}`);
     })
-    .on('request', (req, res) => {
+    .on('mock-start', (cid, req, res) => {
         const start = process.hrtime();
-        console.log(`Request for ${req.url}`);
+        console.log(`${req.method} ${req.url} ${cid}`);
         res
-            .on('close', () => {
+            .on('mock-end', (cid, type, req, res) => {
                 const [sec, nano] = process.hrtime(start);
-                console.warn(`WARN: Request for ${req.url} was closed after ${sec}s ${nano/1000000}ms`);
-            })
-            .on('finish', () => {
-                const [sec, nano] = process.hrtime(start);
-                console.log(`Completed request for ${req.url} in ${sec}s ${nano/1000000}ms`);
+                const duration = `${sec}s ${nano/1000000}ms`;
+                if (type !== 'finish') {
+                    console.warn(`WARN: ${req.method} ${req.url} was closed after ${duration}`);
+                } else {
+                    console.log(`${req.method} ${req.url} in ${duration}`);
+                }
             });
     })
     .on('error', (err) => {
