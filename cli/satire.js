@@ -16,11 +16,11 @@ const server = satire({ argv: true })
         } = server.address();
         console.log(`Listening on ${port}`);
     })
-    .on('mock-start', (cid, req, res) => {
+    .on('mock-start', ({ correlationId: cid, req, res }) => {
         const start = process.hrtime();
         console.log(`${req.method} ${req.url} ${cid}`);
         res
-            .on('mock-end', (cid, type, req, res) => {
+            .on('mock-end', ({ correlationId: cid, type, req, res }) => {
                 const [sec, nano] = process.hrtime(start);
                 const duration = `${sec}s ${nano/1000000}ms`;
                 if (type !== 'finish') {

@@ -20,7 +20,7 @@ const defaultSettings = {
     logger: console
 }
 
-function satire({argv, settings}) {
+function satire({ argv, settings }) {
     const server = httpServer();
     /*
     Get config
