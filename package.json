@@ -14,6 +14,7 @@
   "author": "Aaron Madsen <amadsen@codifiant.com>",
   "license": "MIT",
   "devDependencies": {
+    "nyc": "^11.2.1",
     "tape": "^4.6.3"
   },
   "dependencies": {

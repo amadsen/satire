@@ -17,32 +17,36 @@ const defaultSettings = {
         './mocks/**/*',
         './test/mocks/**/*'
     ],
+    watch: true,
     logger: console
-}
+};
 
-function satire({ argv, settings }) {
-    const server = httpServer();
+function satire({ argv, settings, name }) {
+    const mockServer = httpServer();
     /*
     Get config
     */
     configr8({
-        name: 'satire',
+        name: name || 'satire',
         useEnv: true,
-        useArgv: !(false === argv || Array.isArray(argv)),
+        useArgv: !(false === argv),
         usePkg: true,
         async: true
     })(defaultSettings, settings)
     .then((config) => {
-        server.server.emit('config', config);
-        return Object.assign(config, { emit: (...args) => server.server.emit(...args) })
+        mockServer.server.emit('config', config);
+        return Object.assign(config, {
+            emit: (...args) => mockServer.server.emit(...args),
+            on: (...args) => mockServer.server.on(...args)
+        });
     })
     .then(watchMocks)
-    .then(server.init)
+    .then(mockServer.init)
     .catch((err) => {
-        setImmediate(server.server.emit, 'error', err);
+        setImmediate(mockServer.server.emit, 'error', err);
     });
 
-    return server.server;
+    return mockServer.server;
 }
 
 module.exports = satire;
