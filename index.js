@@ -43,7 +43,7 @@ function satire({ argv, settings, name }) {
     .then(watchMocks)
     .then(mockServer.init)
     .catch((err) => {
-        setImmediate(mockServer.server.emit, 'error', err);
+        mockServer.server.emit('error', err);
     });
 
     return mockServer.server;

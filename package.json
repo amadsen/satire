@@ -4,7 +4,7 @@
   "description": "Intelligent mocking with a purpose",
   "main": "index.js",
   "scripts": {
-    "test": "tape test/**/*-test.js"
+    "test": "nyc tape test/**/*-test.js"
   },
   "keywords": [
     "mock",
