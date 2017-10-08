@@ -1,11 +1,17 @@
 const test = require('tape');
 const { spawn } = require('child_process');
+const path = require('path');
+
+const posixProjectPath = path.normalize(path.resolve(__dirname, '..'))
+    .replace(/^[a-z]+?:/i, '')
+    .split(path.sep)
+    .join(path.posix.sep);
 
 test('Testing command line interface', (suite) => {
     suite.test('loads through satire cli', (t) => {
         const expectedStdout = 'Mock globs: [' +
-            '\n  "/Users/amadsen/dev/node/satire/mocks/**/*",' +
-            '\n  "/Users/amadsen/dev/node/satire/test/mocks/**/*"' +
+            '\n  "' + posixProjectPath + '/mocks/**/*",' +
+            '\n  "' + posixProjectPath + '/test/mocks/**/*"' +
             '\n]' +
             '\nListening on 50001\n';
         let stdout = '';
@@ -32,6 +38,7 @@ test('Testing command line interface', (suite) => {
                 clearTimeout(timer);
             }
             timer = setTimeout(() => {
+                // NOTE: using cp.kill() causes code coverage to be lost! 
                 cp.send({ type: 'exit', exitCode: 0 });
             }, 100);
         });
@@ -48,9 +55,9 @@ test('Testing command line interface', (suite) => {
     });
 
     suite.test('index.js loads through satire cli when started directly', (t) => {
-        const expectedStdout = 'Mock globs: ['+
-            '\n  "/Users/amadsen/dev/node/satire/mocks/**/*",' +
-            '\n  "/Users/amadsen/dev/node/satire/test/mocks/**/*"' +
+        const expectedStdout = 'Mock globs: [' +
+            '\n  "' + posixProjectPath + '/mocks/**/*",' +
+            '\n  "' + posixProjectPath + '/test/mocks/**/*"' +
             '\n]' +
             '\nListening on 50000\n';
         let stdout = '';
@@ -76,6 +83,7 @@ test('Testing command line interface', (suite) => {
                 clearTimeout(timer);
             }
             timer = setTimeout(() => {
+                // NOTE: using cp.kill() causes code coverage to be lost! 
                 cp.send({ type: 'exit', exitCode: 0 });
             }, 100);
         });
