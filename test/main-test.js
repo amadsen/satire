@@ -1,5 +1,4 @@
 const test = require('tape');
-const { exec } = require('child_process');
 const http = require('http');
 
 const satire = require('../');
@@ -252,70 +251,6 @@ test('Should return an HTTP server', (suite) => {
                 }, 200);
             });
         });            
-    });
-
-    suite.end();
-});
-
-test('Testing CLI interface', (suite) => {
-    suite.test('loads through satire cli', (t) => {
-        const expectedStdout = 'Mock globs: ['+
-            '\n  "/Users/amadsen/dev/node/satire/mocks/**/*",' +
-            '\n  "/Users/amadsen/dev/node/satire/test/mocks/**/*"' +
-          '\n]' +
-          '\nListening on 50001';
-        const cp = exec(
-            `${process.argv[0]} ${require.resolve('../cli/satire.js')}`,
-            {
-                env: {
-                    SATIRE_PORT: 50001
-                }
-            },
-            (err, stdout, stderr) => {
-                if (err && !err.killed) {
-                    console.error(err);
-                    t.fail(err, 'running in child process should not error');                    
-                }
-                t.equals(stderr, '', 'There should not be any output to stderr');
-                t.equals(stdout, '', 'Should report listening...');
-
-                t.end();
-            }
-        );
-
-        setTimeout(() => {
-            cp.kill();
-        }, 250);
-    });
-
-    suite.test('index.js loads through satire cli when started directly', (t) => {
-        const expectedStdout = 'Mock globs: ['+
-            '\n  "/Users/amadsen/dev/node/satire/mocks/**/*",' +
-            '\n  "/Users/amadsen/dev/node/satire/test/mocks/**/*"' +
-          '\n]' +
-          '\nListening on 50000';
-        const cp = exec(
-            `${process.argv[0]} ${require.resolve('../')}`,
-            {
-                env: {
-                    SATIRE_PORT: 50000
-                }
-            },
-            (err, stdout, stderr) => {
-                if (err && !err.killed) {
-                    console.error(err);
-                    t.fail(err, 'running in child process should not error');                    
-                }
-                t.equals(stderr, '', 'There should not be any output to stderr');
-                t.equals(stdout, '', 'Should report listening...');
-
-                t.end();
-            }
-        );
-
-        setTimeout(() => {
-            cp.kill();
-        }, 250);
     });
 
     suite.end();
