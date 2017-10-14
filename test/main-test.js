@@ -1,5 +1,6 @@
-const test = require('tape');
+const test = require('tape-catch');
 const http = require('http');
+const testMockApis = require('./support/test-mock-apis.js');
 
 const satire = require('../');
 
@@ -32,11 +33,11 @@ test('Should return an HTTP server', (suite) => {
         });
 
         s.on('config', (cfg) => {
-            t.ok(true, '`config` event triggered');
+            t.pass('`config` event triggered');
             t.deepEqual(cfg, expectedDefaultConfig, 'has expected default configuration');
 
             s.on('loaded', () => {
-                t.ok(true, '`loaded` event triggered');
+                t.pass('`loaded` event triggered');
 
                 // shutdown and dereference the server
                 s.emit('shutdown');
@@ -67,23 +68,28 @@ test('Should return an HTTP server', (suite) => {
         });
 
         s.on('config', (cfg) => {
-            t.ok(true, '`config` event triggered');
+            t.pass('`config` event triggered');
             t.deepEqual(cfg, expectedConfig, 'has expected configuration');
 
             s.on('loaded', () => {
-                t.ok(true, '`loaded` event triggered');
+                t.pass('`loaded` event triggered');
 
                 s.on('listening', (err) => {
-                    t.ok(true, '`listening` event triggered');
+                    t.pass('`listening` event triggered');
                     const {
                         port
                     } = s.address();
                     t.equal(port, expectedConfig.port, `Listening on specified port`);
                 
-                    // shutdown and dereference the server
-                    s.emit('shutdown');
-                    s = null;
-                    t.end();
+                    testMockApis(t.test, {
+                         port,
+                         mockGlobs: cfg.mocks
+                    }, () => {
+                        // shutdown and dereference the server
+                        s.emit('shutdown');
+                        s = null;
+                        t.end();
+                    });
                 });
             });
         });
@@ -114,14 +120,14 @@ test('Should return an HTTP server', (suite) => {
         });
 
         s.on('config', (cfg) => {
-            t.ok(true, '`config` event triggered');
+            t.pass('`config` event triggered');
             t.deepEqual(cfg, expectedConfig, 'has expected configuration');
 
             s.on('loaded', () => {
-                t.ok(true, '`loaded` event triggered');
+                t.pass('`loaded` event triggered');
 
                 s.on('error', (err) => {
-                    t.ok(true, '`error` event triggered');
+                    t.pass('`error` event triggered');
 
                     // shutdown and dereference the blocking server
                     blocking.close();
@@ -139,7 +145,7 @@ test('Should return an HTTP server', (suite) => {
     suite.test('emits an error if mocks is invalid', (t) => {
         const expectedConfig = {
             port: 0,
-            mocks: 1234,
+            mocks: [1234],
             logger: console,
             watch: true,
             _: { errors: [] }
@@ -154,11 +160,11 @@ test('Should return an HTTP server', (suite) => {
         });
 
         s.on('config', (cfg) => {
-            t.ok(true, '`config` event triggered');
+            t.pass('`config` event triggered');
             t.deepEqual(cfg, expectedConfig, 'has expected configuration');
 
             s.on('error', (err) => {
-                t.ok(true, '`error` event triggered');
+                t.pass('`error` event triggered');
 
                 // shutdown and dereference the server
                 s.emit('shutdown');
@@ -189,14 +195,14 @@ test('Should return an HTTP server', (suite) => {
         });
 
         s.on('config', (cfg) => {
-            t.ok(true, '`config` event triggered');
+            t.pass('`config` event triggered');
             t.deepEqual(cfg, expectedConfig, 'has expected configuration');
 
             s.on('loaded', () => {
-                t.ok(true, '`loaded` event triggered');
+                t.pass('`loaded` event triggered');
 
                 s.on('listening', (err) => {
-                    t.ok(true, '`listening` event triggered');
+                    t.pass('`listening` event triggered');
                     const {
                         port
                     } = s.address();
@@ -232,11 +238,11 @@ test('Should return an HTTP server', (suite) => {
         });
 
         s.on('config', (cfg) => {
-            t.ok(true, '`config` event triggered');
+            t.pass('`config` event triggered');
             t.deepEqual(cfg, expectedConfig, 'has expected configuration');
 
             s.on('loaded', () => {
-                t.ok(true, '`loaded` event triggered');
+                t.pass('`loaded` event triggered');
 
                 s.on('listening', (err) => {
                     t.fail(new Error(`${'`listening`'} event triggered when port is '${cfg.port}'`));

@@ -21,6 +21,20 @@ const defaultSettings = {
     logger: console
 };
 
+function normalizeMocks(config) {
+    try {
+        return Object.assign(config, {
+            mocks: [].concat(
+                typeof config.mocks === 'string' ?
+                    JSON.parse(config.mocks) :
+                    config.mocks
+            )
+        });
+    } catch(e) {
+        return Promise.reject(new Error(`Invalid mocks configuration: '${config.mocks}'`));
+    }
+}
+
 function satire({ argv, settings, name }) {
     const mockServer = httpServer();
     /*
@@ -33,6 +47,7 @@ function satire({ argv, settings, name }) {
         usePkg: true,
         async: true
     })(defaultSettings, settings)
+    .then(normalizeMocks)
     .then((config) => {
         mockServer.server.emit('config', config);
         return Object.assign(config, {
@@ -42,6 +57,20 @@ function satire({ argv, settings, name }) {
     })
     .then(watchMocks)
     .then(mockServer.init)
+    .then((config) => {
+        if (typeof config.port === 'number' && config.port >= 0) {
+            return new Promise((resolve) => {
+                mockServer.server.listen(config.port, () => {
+                    // NOTE: We don't bother to check for an error
+                    // in this callback because we would just use
+                    // it to reject this promise - which would then,
+                    // in turn, emit('error', ...) the error on the
+                    // server - which is what happens anyway
+                    return resolve();
+                });
+            });
+        }
+    })
     .catch((err) => {
         mockServer.server.emit('error', err);
     });

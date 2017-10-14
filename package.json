@@ -15,7 +15,8 @@
   "license": "MIT",
   "devDependencies": {
     "nyc": "^11.2.1",
-    "tape": "^4.6.3"
+    "tape": "^4.6.3",
+    "tape-catch": "^1.0.6"
   },
   "dependencies": {
     "chokidar": "^1.7.0",

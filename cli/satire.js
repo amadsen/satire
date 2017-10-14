@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 const errorHandler = (err) => {
     console.error(err);
-    console.error(err.stack);
     process.exit(1);
 }
 process.on('unhandledRejection', errorHandler);
