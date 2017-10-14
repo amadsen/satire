@@ -196,8 +196,6 @@ test('Testing command line interface', (suite) => {
         const cp = spawn(
             `${process.argv[0]}`,
             [
-                '-r',
-                `${require.resolve('./support/child-exit.js')}`,
                 `${require.resolve('../cli/satire.js')}`
             ],
             {
@@ -224,8 +222,6 @@ test('Testing command line interface', (suite) => {
             t.pass('Should report listening...');
             request('http://127.0.0.1:50004/throws/', (err, res, body) => {
                 t.ok(err && err.code === 'ECONNRESET', 'should return a ECONNRESET error');
-
-                cp.send({ type: 'exit', exitCode: 0 }); 
             });
         });
 
