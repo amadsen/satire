@@ -1,4 +1,15 @@
 const request = require('request');
+const fs = require('fs');
+const path = require('path');
+
+const greenDotPng = fs.readFileSync(
+    path.join(__dirname, '..', 'mocks', 'green-dot.png'),
+    { encoding: 'utf8' }
+);
+const greenDotSvg = fs.readFileSync(
+    path.join(__dirname, '..', 'mocks', 'green-dot.svg'),
+    { encoding: 'utf8' }
+);
 
 // TODO: make http requests for each of the mock files
 
@@ -24,6 +35,216 @@ module.exports = (test, { port, mockGlobs }, done) => {
             t.end();
         });
     });
+
+    test('When request is for a module', (t) => {
+        request(`http://127.0.0.1:${port}/a-module`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(body, 'a module', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a module (trailing slash)', (t) => {
+        request(`http://127.0.0.1:${port}/a-module/`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(body, 'a module', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a module (index.js)', (t) => {
+        request(`http://127.0.0.1:${port}/a-module/index.js`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(body, 'a module', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for an invalid module', (t) => {
+        request(`http://127.0.0.1:${port}/circular/`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 404, 'should return a status code of 404');
+            t.equals(body, 'Not Found', 'should return expected body');
+            t.pass('should ignore invalid module');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a file under a non-function module (matching json)', (t) => {
+        request(`http://127.0.0.1:${port}/a-module/with-json-dir/test-req-res.json`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(body, 'You got it!', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a file under a non-function module (plain json)', (t) => {
+        request(`http://127.0.0.1:${port}/a-module/with-json-dir/test.json`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(
+                body,
+                JSON.stringify({
+                    one: 1,
+                    two: [0, 1],
+                    three: {
+                        a: "eh",
+                        b: "bee",
+                        c: "see"
+                    }
+                }, null, 2),
+                'should return expected body'
+            );
+
+            t.end();
+        });
+    });
+
+    test('When request is for a module that is a function', (t) => {
+        request(`http://127.0.0.1:${port}/a-fn-module/`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(body, 'a function module', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a path under a module that is a function', (t) => {
+        request(`http://127.0.0.1:${port}/a-fn-module/with-json-dir/`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(body, 'a function module', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a file under a module that is a function (matching json)', (t) => {
+        request(`http://127.0.0.1:${port}/a-fn-module/with-json-dir/test-req-res.json`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(body, 'a function module', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a file under a module that is a function (plain json)', (t) => {
+        request(`http://127.0.0.1:${port}/a-fn-module/with-json-dir/test.json`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(body, 'a function module', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a json file (matching json)', (t) => {
+        request(`http://127.0.0.1:${port}/json/test-req-res.json`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(body, 'You got it!', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a json file (plain json)', (t) => {
+        request(`http://127.0.0.1:${port}/json/test.json`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(
+                body,
+                JSON.stringify({
+                    one: 1,
+                    two: [0, 1],
+                    three: {
+                        a: "eh",
+                        b: "bee",
+                        c: "see"
+                    }
+                }, null, 2),
+                'should return expected body'
+            );
+
+            t.end();
+        });
+    });
+
+    test('When request is for a text file', (t) => {
+        request(`http://127.0.0.1:${port}/string.txt`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(
+                res.headers['content-type'],
+                'text/plain',
+                'should return text/plain content-type'
+            );
+            t.equals(body, 'This is a string', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a png file', (t) => {
+        request(`http://127.0.0.1:${port}/green-dot.png`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(
+                res.headers['content-type'],
+                'image/png',
+                'should return png content-type'
+            );
+            t.equals(body, greenDotPng, 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for an svg file', (t) => {
+        request(`http://127.0.0.1:${port}/green-dot.svg`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(
+                res.headers['content-type'],
+                'image/svg+xml',
+                'should return svg content-type'
+            );
+            t.equals(body, greenDotSvg, 'should return expected body');
+
+            t.end();
+        });
+    });
+    /*
+    TODO: a test mock object that matches using: regexp
+    TODO: a test mock object that matches using: function
+    TODO: a test mock object that matches using: array
+    */
 
     test('Should complete excercising test mock APIs', (t) => {
         t.end();

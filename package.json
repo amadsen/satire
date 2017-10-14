@@ -23,6 +23,7 @@
     "configr8": "^1.0.0-alpha.7",
     "glob-parent": "^3.1.0",
     "globby": "^6.1.0",
+    "mime": "^2.0.3",
     "request": "^2.83.0",
     "type-of": "^2.0.1",
     "uuid": "^3.1.0"
