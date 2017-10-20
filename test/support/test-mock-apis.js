@@ -240,11 +240,74 @@ module.exports = (test, { port, mockGlobs }, done) => {
             t.end();
         });
     });
-    /*
-    TODO: a test mock object that matches using: regexp
-    TODO: a test mock object that matches using: function
-    TODO: a test mock object that matches using: array
-    */
+
+    test('When request is for a mock with complex matching conditions (404)', (t) => {
+        request(`http://127.0.0.1:${port}/complex/`, (err, res, body) => {
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 404, 'should return a status code of 404');
+            t.equals(body, 'Not Found', 'should return expected body');
+
+            t.end();
+        });
+    });
+
+    test('When request is for a mock with complex matching conditions (200)', (t) => {
+        request({
+             url: `http://127.0.0.1:${port}/complex/`,
+             headers: {
+                 Accept: 'application/json',
+                 Authorization: 'Bearer mockbearertoken'
+             }
+            },
+            (err, res, body) => {
+                t.error(err, 'should not return an error');
+                t.ok(res, 'should return a response object');
+                t.equals(res.statusCode, 200, 'should return a status code of 200');
+                t.equals(
+                    res.headers['content-type'],
+                    'application/json',
+                    'should return application/json content-type'
+                );
+                t.deepEquals(
+                    JSON.parse(body),
+                    {
+                        imaginary: true,
+                        value: 2
+                    },
+                    'should return expected body'
+                );
+
+                t.end();
+            }
+        );
+    });
+
+    test('When request is for a mock with timeToRespond set', (t) => {
+        const start = Date.now();
+        request(`http://127.0.0.1:${port}/timeout/`, (err, res, body) => {
+            const duration = Date.now() - start;
+            t.error(err, 'should not return an error');
+            t.ok(res, 'should return a response object');
+            t.equals(res.statusCode, 200, 'should return a status code of 200');
+            t.equals(
+                res.headers['content-type'],
+                'application/json',
+                'should return application/json content-type'
+            );
+            t.deepEquals(
+                JSON.parse(body),
+                {
+                    tortise: 1,
+                    hare: 0
+                },
+                'should return expected body'
+            );
+            t.ok(/[34]\d\d/.test(`${duration}`), 'should take about 300ms')
+
+            t.end();
+        });
+    });
 
     test('Should complete excercising test mock APIs', (t) => {
         t.end();
