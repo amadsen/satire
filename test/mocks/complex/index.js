@@ -2,14 +2,8 @@ module.exports = [{
     request: {
         method: /GET|POST/i,
         headers: [
-            ({ accept }) => {
-                console.log('1|Accept:', accept);
-                return /json/.test(accept);
-            },
-            ({ authorization }) => {
-                console.log('1|Authorization:', authorization);
-                return /^Bearer\s/.test(authorization);
-            },
+            ({ accept }) => /json/.test(accept),
+            ({ authorization }) => /^Bearer\s/.test(authorization),
         ]
     },
     response: {
@@ -26,14 +20,8 @@ module.exports = [{
     request: {
         method: /GET|POST/i,
         headers: [
-            ({ accept }) => {
-                console.log('2|Accept:', accept);
-                return !/json/.test(accept)
-            },
-            ({ authorization }) => {
-                console.log('2|Authorization:', authorization);
-                return !/^Bearer\s/.test(authorization)
-            },
+            ({ accept }) => !/json/.test(accept),
+            ({ authorization }) => !/^Bearer\s/.test(authorization),
         ]
     },
     response: {

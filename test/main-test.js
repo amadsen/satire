@@ -1,5 +1,8 @@
 const test = require('tape-catch');
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const request = require('request');
 const testMockApis = require('./support/test-mock-apis.js');
 
 const satire = require('../');
@@ -47,6 +50,62 @@ test('Should return an HTTP server', (suite) => {
         });
     });
 
+    /*
+    Add test for directly configured mocks
+    */
+    suite.test('that supports directly configured mocks', (t) => {
+        const expectedDirectConfig = {
+            port: 0,
+            mocks: [
+                { path: '/direct/', mock: 'This is a direct mock' }
+            ],
+            logger: console,
+            watch: true,
+            _: { errors: [] }
+        };
+
+        let s = satire({
+            name: '__satire-test-1__',
+            argv: false,
+            settings: {
+                mocks: [
+                    { path: '/direct/', mock: 'This is a direct mock' }
+                ]
+            }
+        });
+
+        s.on('config', (cfg) => {
+            t.pass('`config` event triggered');
+            t.deepEqual(cfg, expectedDirectConfig, 'has expected direct mock configuration');
+        });
+
+        s.on('listening', (err) => {
+            t.pass('`listening` event triggered');
+            const {
+                port
+            } = s.address();
+
+            request(
+                `http://127.0.0.1:${port}/direct/`,
+                (err, res, body) => {
+                    t.error(err, 'should not return an error');
+                    t.ok(res, 'should return a response object');
+                    t.equals(res.statusCode, 200, 'should return a status code of 200');
+                    t.equals(
+                        body,
+                        '"This is a direct mock"',
+                        'should return configured direct mock'
+                    );
+
+                    // shutdown and dereference the server
+                    s.emit('shutdown');
+                    s = null;
+                    t.end();
+                }
+            );
+        });
+    });
+
     suite.test('started on the port specified by config', (t) => {
         const expectedConfig = {
             port: 8080,
@@ -90,6 +149,92 @@ test('Should return an HTTP server', (suite) => {
                         s = null;
                         t.end();
                     });
+                });
+            });
+        });
+    });
+
+    suite.test('should fire events for changes to mock files', (t) => {
+        const expectedConfig = {
+            port: 8080,
+            mocks: [
+                './mocks/**/*',
+                './test/mocks/**/*'
+            ],
+            logger: console,
+            watch: true,
+            _: { errors: [] }
+        };
+
+        let s = satire({
+            name: '__satire-test-2__',
+            argv: false,
+            settings: {
+                port: 8080
+            }
+        });
+
+        s.on('config', (cfg) => {
+            t.pass('`config` event triggered');
+            t.deepEqual(cfg, expectedConfig, 'has expected configuration');
+
+            s.on('loaded', () => {
+                t.pass('`loaded` event triggered');
+
+                s.on('listening', (err) => {
+                    t.pass('`listening` event triggered');
+                    const {
+                        port
+                    } = s.address();
+                    t.equal(port, expectedConfig.port, `Listening on specified port`);
+                
+                    request(
+                        `http://127.0.0.1:${port}/post-file/`,
+                        {
+                            method: 'POST',
+                            json: true,
+                            body: {
+                                name: 'posted-file.json',
+                                contents: {
+                                    one: 'fish',
+                                    two: 'fish',
+                                    red: 'fish',
+                                    blue: 'fish'
+                                }
+                            }
+                        },
+                        (err, res, body) => {
+                            t.error(err, 'should not return an error');
+                            t.ok(res, 'should return a response object');
+                            t.equals(res.statusCode, 204, 'should return a status code of 204');
+                        }
+                    );
+                });
+
+                s.once('mock-updated', (aFilePath) => {
+                    const expectedPath = path.normalize(
+                        path.join(__dirname, 'mocks', 'post-file', 'posted-file.json')
+                    );
+
+                    t.pass('should emit "mock-updated" event');
+                    t.equals(
+                        aFilePath,
+                        expectedPath,
+                        'should emit `mock-updated` event for changes to mocks on file system'
+                    );
+
+                    s.once('mock-updated', (deletedFilePath) => {
+                        t.equals(
+                            deletedFilePath,
+                            expectedPath,
+                            'should emit "mock-updated" event for deletes'
+                        );
+                        // shutdown and dereference the server
+                        s.emit('shutdown');
+                        s = null;
+                        t.end();
+                    });
+                    fs.unlinkSync(expectedPath);
                 });
             });
         });
@@ -257,6 +402,53 @@ test('Should return an HTTP server', (suite) => {
                 }, 200);
             });
         });            
+    });
+
+    suite.test('watch can be turned off', (t) => {
+        const expectedConfig = {
+            port: 0,
+            mocks: [
+                './mocks/**/*',
+                './test/mocks/**/*'
+            ],
+            logger: console,
+            watch: false,
+            _: { errors: [] }
+        };
+
+        let s = satire({
+            name: '__satire-test-2__',
+            argv: false,
+            settings: {
+                watch: false
+            }
+        });
+
+        s.on('config', (cfg) => {
+            t.pass('`config` event triggered');
+            t.deepEqual(cfg, expectedConfig, 'has expected configuration');
+
+            s.on('loaded', () => {
+                t.pass('`loaded` event triggered');
+
+                s.on('listening', (err) => {
+                    t.pass('`listening` event triggered');
+                    const {
+                        port
+                    } = s.address();
+
+                    testMockApis(t.test, {
+                         port,
+                         mockGlobs: cfg.mocks
+                    }, () => {
+                        // shutdown and dereference the server
+                        s.emit('shutdown');
+                        s = null;
+                        t.end();
+                    });
+                });
+            });
+        });
     });
 
     suite.end();
