@@ -7,9 +7,12 @@
 */
 
 const configr8 = require('configr8');
+const type = require('type-of');
 
-const watchMocks = require('./lib/watch-mocks.js');
+const prepMocks = require('./lib/prepare-mocks.js');
 const httpServer = require('./lib/http-server');
+const callingFile = require('./lib/calling-file.js');
+const mayRequire = require('./lib/may-require.js');
 
 const defaultSettings = {
     port: 0,
@@ -17,8 +20,7 @@ const defaultSettings = {
         './mocks/**/*',
         './test/mocks/**/*'
     ],
-    watch: true,
-    logger: console
+    watch: true
 };
 
 function normalizeMocks(config) {
@@ -31,8 +33,54 @@ function normalizeMocks(config) {
             )
         });
     } catch(e) {
-        return Promise.reject(new Error(`Invalid mocks configuration: '${config.mocks}'`));
+        throw new Error(`Invalid mocks configuration: '${config.mocks}'`);
     }
+}
+
+const watchTypes = {
+    // explicitly treat null and undefined as false
+    null: () => false,
+    undefined: () => false,
+    // config.watch may be a function
+    function: (w) => w,
+    object: (w) => {
+        // or an object with module and args
+        return mayRequire({
+            from: callingFile({
+                dir: true,
+                ignore: [require.resolve('./cli/satire.js')]
+            }) || process.cwd()
+        })(w.module)(...w.args)[1]; 
+    },
+    string: (w) => watchTypes.object({ module: w }),
+    boolean: (w) => {
+        // or true, indicating the default watchers
+        if (w === true) {
+            const [e1, nsfw] = mayRequire('./lib/watchers/nsfw.js');
+            const [e2, sane] = mayRequire('./lib/watchers/sane.js');
+            const w = nsfw || sane;
+            if (!w) {
+                let err = new Error('Unable to provide a default file watcher.');
+                err.chain = [e1, e2];
+                throw err;
+            }
+            return w;
+        }
+        // false means no watchers
+        return false;
+    },
+    throws: (w) => {
+        throw new Error(`Unsupported watch configuration: ${watch}`);
+    }
+};
+
+function normalizeWatch(config) {
+    const fn = watchTypes[ type(config.watch) ] || watchTypes.throws;
+    const watch = fn(config.watch);
+
+    return Object.assign(config, {
+        watch
+    });
 }
 
 function satire({ argv, settings, name }) {
@@ -48,6 +96,7 @@ function satire({ argv, settings, name }) {
         async: true
     })(defaultSettings, settings)
     .then(normalizeMocks)
+    .then(normalizeWatch)
     .then((config) => {
         mockServer.server.emit('config', config);
         return Object.assign(config, {
@@ -55,12 +104,13 @@ function satire({ argv, settings, name }) {
             on: (...args) => mockServer.server.on(...args)
         });
     })
-    .then(watchMocks)
+    .then(prepMocks)
     .then(mockServer.init)
     .then((config) => {
         if (typeof config.port === 'number' && config.port >= 0) {
             return new Promise((resolve) => {
-                mockServer.server.listen(config.port, () => {
+                mockServer.server.listen(config.port);
+                mockServer.server.on('listening', () => {
                     // NOTE: We don't bother to check for an error
                     // in this callback because we would just use
                     // it to reject this promise - which would then,

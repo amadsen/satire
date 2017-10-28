@@ -5,6 +5,9 @@ const path = require('path');
 const request = require('request');
 const testMockApis = require('./support/test-mock-apis.js');
 
+const saneWatcher = require('../lib/watchers/sane.js');
+//const sentinelWatcher = require('../lib/watchers/nsfw.js');
+
 const satire = require('../');
 
 const originalEnv = Object.assign(process.env);
@@ -24,8 +27,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            logger: console,
-            watch: true,
+            watch: saneWatcher,
             _: { errors: [] }
         };
 
@@ -59,8 +61,7 @@ test('Should return an HTTP server', (suite) => {
             mocks: [
                 { path: '/direct/', mock: 'This is a direct mock' }
             ],
-            logger: console,
-            watch: true,
+            watch: saneWatcher,
             _: { errors: [] }
         };
 
@@ -113,8 +114,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            logger: console,
-            watch: true,
+            watch: saneWatcher,
             _: { errors: [] }
         };
 
@@ -161,8 +161,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            logger: console,
-            watch: true,
+            watch: saneWatcher,
             _: { errors: [] }
         };
 
@@ -251,8 +250,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            logger: console,
-            watch: true,
+            watch: saneWatcher,
             _: { errors: [] }
         };
 
@@ -291,8 +289,7 @@ test('Should return an HTTP server', (suite) => {
         const expectedConfig = {
             port: 0,
             mocks: [1234],
-            logger: console,
-            watch: true,
+            watch: saneWatcher,
             _: { errors: [] }
         };
 
@@ -326,8 +323,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            logger: console,
-            watch: true,
+            watch: saneWatcher,
             _: { errors: [] }
         };
 
@@ -369,8 +365,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            logger: console,
-            watch: true,
+            watch: saneWatcher,
             _: { errors: [] }
         };
 
@@ -411,7 +406,6 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            logger: console,
             watch: false,
             _: { errors: [] }
         };
