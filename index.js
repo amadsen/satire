@@ -11,8 +11,8 @@ const type = require('type-of');
 
 const prepMocks = require('./lib/prepare-mocks.js');
 const httpServer = require('./lib/http-server');
-const callingFile = require('./lib/calling-file.js');
-const mayRequire = require('./lib/may-require.js');
+const callingFile = require('calling-file');
+const mayRequire = require('may-require');
 
 const defaultSettings = {
     port: 0,
@@ -45,12 +45,23 @@ const watchTypes = {
     function: (w) => w,
     object: (w) => {
         // or an object with module and args
-        return mayRequire({
+        const [err, watcher] = mayRequire({
+            /*
+            Require in the context of the file that called
+            satire UNLESS it is the satire CLI.
+            */
             from: callingFile({
                 dir: true,
                 ignore: [require.resolve('./cli/satire.js')]
             }) || process.cwd()
-        })(w.module)(...w.args)[1]; 
+        })(w.module);
+
+        if(err) {
+            // optional require let us specifify a "from" directory
+            throw err;
+        }
+
+        return watcher(...w.args);
     },
     string: (w) => watchTypes.object({ module: w }),
     boolean: (w) => {
@@ -58,13 +69,13 @@ const watchTypes = {
         if (w === true) {
             const [e1, nsfw] = mayRequire('./lib/watchers/nsfw.js');
             const [e2, sane] = mayRequire('./lib/watchers/sane.js');
-            const w = nsfw || sane;
-            if (!w) {
+            const watcher = nsfw || sane;
+            if (!watcher) {
                 let err = new Error('Unable to provide a default file watcher.');
                 err.chain = [e1, e2];
                 throw err;
             }
-            return w;
+            return watcher;
         }
         // false means no watchers
         return false;
