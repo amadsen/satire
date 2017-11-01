@@ -1,7 +1,8 @@
 const test = require('tape-catch');
 const request = require('request');
 
-const saneWatcher = require('../lib/watchers/sane.js');
+const chokidarWatcher = require('../lib/watchers/chokidar.js');
+//const saneWatcher = require('../lib/watchers/sane.js');
 //const sentinelWatcher = require('../lib/watchers/nsfw.js');
 
 const satire = require('../');
@@ -19,7 +20,7 @@ test('Should support proxying of HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            watch: saneWatcher,
+            watch: chokidarWatcher,
             proxyAPIs: {
                 '/proxy/': 'http://127.0.0.1:8090/',
                 '/json-proxy/': 'http://127.0.0.1:8090/json/'

@@ -20,10 +20,12 @@
   },
   "dependencies": {
     "calling-file": "^1.0.0",
+    "chokidar": "^1.7.0",
     "configr8": "^1.0.0-alpha.7",
     "glob-parent": "^3.1.0",
     "globby": "^6.1.0",
     "may-require": "^1.0.0",
+    "micromatch": "^3.1.4",
     "mime": "^2.0.3",
     "request": "^2.83.0",
     "type-of": "^2.0.1",

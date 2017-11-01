@@ -5,7 +5,8 @@ const path = require('path');
 const request = require('request');
 const testMockApis = require('./support/test-mock-apis.js');
 
-const saneWatcher = require('../lib/watchers/sane.js');
+const chokidarWatcher = require('../lib/watchers/chokidar.js');
+//const saneWatcher = require('../lib/watchers/sane.js');
 //const sentinelWatcher = require('../lib/watchers/nsfw.js');
 
 const satire = require('../');
@@ -27,7 +28,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            watch: saneWatcher,
+            watch: chokidarWatcher,
             _: { errors: [] }
         };
 
@@ -61,7 +62,7 @@ test('Should return an HTTP server', (suite) => {
             mocks: [
                 { path: '/direct/', mock: 'This is a direct mock' }
             ],
-            watch: saneWatcher,
+            watch: chokidarWatcher,
             _: { errors: [] }
         };
 
@@ -114,7 +115,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            watch: saneWatcher,
+            watch: chokidarWatcher,
             _: { errors: [] }
         };
 
@@ -161,7 +162,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            watch: saneWatcher,
+            watch: chokidarWatcher,
             _: { errors: [] }
         };
 
@@ -250,7 +251,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            watch: saneWatcher,
+            watch: chokidarWatcher,
             _: { errors: [] }
         };
 
@@ -289,7 +290,7 @@ test('Should return an HTTP server', (suite) => {
         const expectedConfig = {
             port: 0,
             mocks: [1234],
-            watch: saneWatcher,
+            watch: chokidarWatcher,
             _: { errors: [] }
         };
 
@@ -323,7 +324,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            watch: saneWatcher,
+            watch: chokidarWatcher,
             _: { errors: [] }
         };
 
@@ -365,7 +366,7 @@ test('Should return an HTTP server', (suite) => {
                 './mocks/**/*',
                 './test/mocks/**/*'
             ],
-            watch: saneWatcher,
+            watch: chokidarWatcher,
             _: { errors: [] }
         };
 
