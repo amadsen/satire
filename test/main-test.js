@@ -166,6 +166,8 @@ test('Should return an HTTP server', (suite) => {
             _: { errors: [] }
         };
 
+        const expectedNotWatchedPath = path.join(__dirname, '..', 'should-not-be-watched.json');
+
         let s = satire({
             name: '__satire-test-2__',
             argv: false,
@@ -187,7 +189,14 @@ test('Should return an HTTP server', (suite) => {
                         port
                     } = s.address();
                     t.equal(port, expectedConfig.port, `Listening on specified port`);
-                
+
+                    fs.writeFileSync(
+                        expectedNotWatchedPath,
+                        JSON.stringify({
+                            bad: 'Do not touch!'
+                        })
+                    );
+
                     request(
                         `http://127.0.0.1:${port}/post-file/`,
                         {
@@ -234,6 +243,7 @@ test('Should return an HTTP server', (suite) => {
                         s = null;
                         t.end();
                     });
+                    fs.unlinkSync(expectedNotWatchedPath);
                     fs.unlinkSync(expectedPath);
                 });
             });

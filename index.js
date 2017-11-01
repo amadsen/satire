@@ -67,15 +67,7 @@ const watchTypes = {
     boolean: (w) => {
         // or true, indicating the default watchers
         if (w === true) {
-            const [e1, nsfw] = mayRequire('./lib/watchers/nsfw.js');
-            const [e2, chokidar] = mayRequire('./lib/watchers/chokidar.js');
-            const watcher = nsfw || chokidar;
-            if (!watcher) {
-                let err = new Error('Unable to provide a default file watcher.');
-                err.chain = [e1, e2];
-                throw err;
-            }
-            return watcher;
+            return require('./lib/watchers/chokidar.js');
         }
         // false means no watchers
         return false;
