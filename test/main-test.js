@@ -6,8 +6,6 @@ const request = require('request');
 const testMockApis = require('./support/test-mock-apis.js');
 
 const chokidarWatcher = require('../lib/watchers/chokidar.js');
-//const saneWatcher = require('../lib/watchers/sane.js');
-//const sentinelWatcher = require('../lib/watchers/nsfw.js');
 
 const satire = require('../');
 

@@ -2,8 +2,6 @@ const test = require('tape-catch');
 const request = require('request');
 
 const chokidarWatcher = require('../lib/watchers/chokidar.js');
-//const saneWatcher = require('../lib/watchers/sane.js');
-//const sentinelWatcher = require('../lib/watchers/nsfw.js');
 
 const satire = require('../');
 
