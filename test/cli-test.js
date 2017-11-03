@@ -10,8 +10,6 @@ const posixProjectPath = path.normalize(path.resolve(__dirname, '..'))
     .split(path.sep)
     .join(path.posix.sep);
 
-console.log(posixProjectPath);
-
 test('Testing command line interface', (suite) => {
     suite.test('loads through satire cli', (t) => {
         const expectedStdout = 'Mock globs: [' +

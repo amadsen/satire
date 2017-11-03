@@ -42,44 +42,51 @@ const watchTypes = {
     null: () => false,
     undefined: () => false,
     // config.watch may be a function
-    function: (w) => w,
-    object: (w) => {
+    function: ({ watch }) => watch,
+    object: ({ watch, from }) => {
         // or an object with module and args
         const [err, watcher] = mayRequire({
             /*
             Require in the context of the file that called
             satire UNLESS it is the satire CLI.
             */
-            from: callingFile({
-                dir: true,
-                ignore: [require.resolve('./cli/satire.js')]
-            }) || process.cwd()
-        })(w.module);
+            from: from || process.cwd() 
+        })(watch.module);
 
-        if(err) {
-            // optional require let us specifify a "from" directory
+        if (err) {
+            // may-require let us specifify a "from" directory
             throw err;
         }
 
-        return watcher(...w.args);
+        return watcher.bind(null, ...(watch.args || []));
     },
-    string: (w) => watchTypes.object({ module: w }),
-    boolean: (w) => {
+    string: ({ watch, from }) => watchTypes.object({
+        watch: {
+            module: watch
+        },
+        from
+    }),
+    boolean: ({ watch }) => {
         // or true, indicating the default watchers
-        if (w === true) {
+        if (watch === true) {
             return require('./lib/watchers/chokidar.js');
         }
         // false means no watchers
         return false;
     },
-    throws: (w) => {
-        throw new Error(`Unsupported watch configuration: ${watch}`);
+    error: ({ watch, type }) => {
+        throw new Error(`Unsupported watch configuration: ${type} ${watch}`);
     }
 };
 
-function normalizeWatch(config) {
-    const fn = watchTypes[ type(config.watch) ] || watchTypes.throws;
-    const watch = fn(config.watch);
+function normalizeWatch(config, from) {
+    const t = type(config.watch);
+    const fn = watchTypes[t] || watchTypes.error;
+    const watch = fn({
+        watch: config.watch,
+        type: t,
+        from
+    });
 
     return Object.assign(config, {
         watch
@@ -87,6 +94,11 @@ function normalizeWatch(config) {
 }
 
 function satire({ argv, settings, name }) {
+    const from = callingFile({
+        dir: true,
+        ignore: [require.resolve('./cli/satire.js')]
+    });
+
     const mockServer = httpServer();
     /*
     Get config
@@ -99,7 +111,7 @@ function satire({ argv, settings, name }) {
         async: true
     })(defaultSettings, settings)
     .then(normalizeMocks)
-    .then(normalizeWatch)
+    .then((config) => normalizeWatch(config, from))
     .then((config) => {
         mockServer.server.emit('config', config);
         return Object.assign(config, {
