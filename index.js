@@ -13,6 +13,7 @@ const prepMocks = require('./lib/prepare-mocks.js');
 const httpServer = require('./lib/http-server');
 const callingFile = require('calling-file');
 const mayRequire = require('may-require');
+const trike = require('trike');
 
 const defaultSettings = {
     port: 0,
@@ -24,17 +25,20 @@ const defaultSettings = {
 };
 
 function normalizeMocks(config) {
-    try {
-        return Object.assign(config, {
-            mocks: [].concat(
-                typeof config.mocks === 'string' ?
-                    JSON.parse(config.mocks) :
-                    config.mocks
-            )
-        });
-    } catch(e) {
-        throw new Error(`Invalid mocks configuration: '${config.mocks}'`);
-    }
+    const mocks = [].concat(
+        (typeof config.mocks === 'string' ?
+            trike(JSON.parse, config.mocks)[1] : null
+        ) || config.mocks
+    ).filter((mock) => {
+        if (!(mock && (typeof mock === 'string' || (mock.path && mock.mock)))) {
+            throw new Error(`Invalid mocks configuration: '${config.mocks}'`);
+        }
+        return true;
+    });
+
+    return Object.assign(config, {
+        mocks
+    });
 }
 
 const watchTypes = {

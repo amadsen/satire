@@ -48,4 +48,4 @@ module.exports = ({ request: req, response: res }) => {
             }
         );
     });
-}
+};
