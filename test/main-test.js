@@ -27,6 +27,7 @@ test('Should return an HTTP server', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -61,6 +62,7 @@ test('Should return an HTTP server', (suite) => {
                 { path: '/direct/', mock: 'This is a direct mock' }
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -114,6 +116,7 @@ test('Should return an HTTP server', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -161,6 +164,7 @@ test('Should return an HTTP server', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -256,6 +260,7 @@ test('Should return an HTTP server', (suite) => {
                 './test/mocks/(post-file|json)(|/*|/**/*)'
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -359,6 +364,7 @@ test('Should return an HTTP server', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -398,6 +404,7 @@ test('Should return an HTTP server', (suite) => {
             port: 0,
             mocks: [1234],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -427,6 +434,7 @@ test('Should return an HTTP server', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -469,6 +477,7 @@ test('Should return an HTTP server', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -510,6 +519,7 @@ test('Should return an HTTP server', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: false,
+            from: __dirname,
             _: { errors: [] }
         };
 

@@ -20,6 +20,7 @@ test('Should allow watch to be configured', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -55,6 +56,7 @@ test('Should allow watch to be configured', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: chokidarWatcher,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -92,6 +94,7 @@ test('Should allow watch to be configured', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: false,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -129,6 +132,7 @@ test('Should allow watch to be configured', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: false,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -166,6 +170,7 @@ test('Should allow watch to be configured', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: false,
+            from: __dirname,
             _: { errors: [] }
         };
 
@@ -215,6 +220,7 @@ test('Should allow watch to be configured', (suite) => {
                 './test/mocks/**/*'
             ],
             watch: watchFn,
+            from: __dirname,
             _: { errors: [] }
         };
 

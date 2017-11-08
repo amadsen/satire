@@ -23,6 +23,7 @@ test('Should support proxying of HTTP server', (suite) => {
                 '/proxy/': 'http://127.0.0.1:8090/',
                 '/json-proxy/': 'http://127.0.0.1:8090/json/'
             },
+            from: __dirname,
             _: { errors: [] }
         };
 

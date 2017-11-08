@@ -54,7 +54,7 @@ const watchTypes = {
             Require in the context of the file that called
             satire UNLESS it is the satire CLI.
             */
-            from: from || process.cwd() 
+            from
         })(watch.module);
 
         if (err) {
@@ -83,13 +83,13 @@ const watchTypes = {
     }
 };
 
-function normalizeWatch(config, from) {
+function normalizeWatch(config) {
     const t = type(config.watch);
     const fn = watchTypes[t] || watchTypes.error;
     const watch = fn({
         watch: config.watch,
         type: t,
-        from
+        from: config.from
     });
 
     return Object.assign(config, {
@@ -98,10 +98,10 @@ function normalizeWatch(config, from) {
 }
 
 function satire({ argv, settings, name }) {
-    const from = callingFile({
+    defaultSettings.from = callingFile({
         dir: true,
         ignore: [require.resolve('./cli/satire.js')]
-    });
+    }) || process.cwd();
 
     const mockServer = httpServer();
     /*
@@ -115,7 +115,7 @@ function satire({ argv, settings, name }) {
         async: true
     })(defaultSettings, settings)
     .then(normalizeMocks)
-    .then((config) => normalizeWatch(config, from))
+    .then((config) => normalizeWatch(config))
     .then((config) => {
         mockServer.server.emit('config', config);
         return Object.assign(config, {
