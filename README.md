@@ -80,7 +80,11 @@ Additionally, the returned `EventEmitter` should have a `.close()` method which 
 
 **default:** undefined
 
-Keys that begin with a `"/"` will be used to create a `RegExp` that searches for the key at the begining or the request URL. The first such `pattern` to match will be used. The value of this key should be a `template` used to create the target URL for the proxy using [`requestUrl.replace(pattern, template)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace).
+Keys that begin with a `"/"` will be used to create a `RegExp` that searches for the key at the begining or the request URL. The first such `pattern` to match will be used. The value of this key should be one of:
+
++ a `template` string used to create the target URL for the proxy using [`requestUrl.replace(pattern, template)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace).
++ a `Function` which take a `RegExp` pattern - the one that defines the proxy route - and a standard [Node http `request` `IncomingMessage`](https://nodejs.org/api/http.html#http_class_http_incomingmessage). This function should return an object containing a `url` and other options accepted by the [`request`](https://github.com/request/request) module.
++ an `Object` with a `module` property indicating a module to be required. This module should export a `Function` that is passed the proxy object and returns a proxy `template` or `Function`.
 
 Proxy APIs have a lower priority than any mock definitions that would match the same url.
 
