@@ -1,6 +1,6 @@
 {
   "name": "satire",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "Intelligent mocking with a purpose",
   "main": "index.js",
   "bin": {
@@ -36,5 +36,16 @@
     "type-of": "^2.0.1",
     "unixify": "^1.0.0",
     "uuid": "^3.1.0"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amadsen/satire.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amadsen/satire/issues"
+  },
+  "homepage": "https://github.com/amadsen/satire#readme"
 }
