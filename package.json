@@ -1,6 +1,6 @@
 {
   "name": "satire",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "Intelligent mocking with a purpose",
   "main": "index.js",
   "bin": {
@@ -31,6 +31,7 @@
     "micromatch": "^3.1.4",
     "mime": "^2.0.3",
     "request": "^2.83.0",
+    "stable": "^0.1.6",
     "trike": "^1.0.0",
     "type-of": "^2.0.1",
     "unixify": "^1.0.0",

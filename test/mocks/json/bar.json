@@ -1,0 +1,11 @@
+{
+    "request": {
+        "method": "POST"
+    },
+    "response": {
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "You got it!"
+    }
+}

@@ -170,6 +170,28 @@ module.exports = (test, { port, mockGlobs }, done) => {
         });
     });
 
+    test('When request is for a path matching a json file (matching json)', (t) => {
+      request(`http://127.0.0.1:${port}/json/test-req-res`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(body, 'You got it!', 'should return expected body');
+
+        t.end();
+      });
+    });
+
+    test('When request is for a directory path matching a json file (matching json)', (t) => {
+      request(`http://127.0.0.1:${port}/json/test-req-res/`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(body, 'You got it!', 'should return expected body');
+
+        t.end();
+      });
+    });
+
     test('When request is for a json file (plain json)', (t) => {
         request(`http://127.0.0.1:${port}/json/test.json`, (err, res, body) => {
             t.error(err, 'should not return an error');
@@ -191,6 +213,176 @@ module.exports = (test, { port, mockGlobs }, done) => {
 
             t.end();
         });
+    });
+
+    test('When request is for a path matching a json file (plain json)', (t) => {
+      request(`http://127.0.0.1:${port}/json/test`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+            body,
+            JSON.stringify({
+                one: 1,
+                two: [0, 1],
+                three: {
+                    a: "eh",
+                    b: "bee",
+                    c: "see"
+                }
+            }, null, 2),
+            'should return expected body'
+        );
+
+        t.end();
+      });
+    });
+
+    test('When request is for a directory path matching a json file (plain json)', (t) => {
+      request(`http://127.0.0.1:${port}/json/test/`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+            body,
+            JSON.stringify({
+                one: 1,
+                two: [0, 1],
+                three: {
+                    a: "eh",
+                    b: "bee",
+                    c: "see"
+                }
+            }, null, 2),
+            'should return expected body'
+        );
+
+        t.end();
+      });
+    });
+
+    test('When request is for a path matching a json file and a module', (t) => {
+      request(`http://127.0.0.1:${port}/json/foo`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+          body,
+          JSON.stringify({
+            foo: 'json'
+          }, null, 2),
+          'should return expected body'
+        );
+
+        t.end();
+      });
+    });
+
+    test('When request is for a directory path matching a json file and a module', (t) => {
+      request(`http://127.0.0.1:${port}/json/foo/`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+          body,
+          JSON.stringify({
+            foo: 'json'
+          }, null, 2),
+          'should return expected body'
+        );
+
+        t.end();
+      });
+    });
+
+    test('When request is for a module under a directory path matching a json file', (t) => {
+      request(`http://127.0.0.1:${port}/json/foo/index.js`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+          body,
+          "json/foo/index.js",
+          'should return expected body'
+        );
+
+        t.end();
+      });
+    });
+
+    test('When request is for a path matching a json file that matched and a module', (t) => {
+      request(`http://127.0.0.1:${port}/json/bar`, { method: 'POST' }, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+          body,
+          "You got it!",
+          'should return expected body'
+        );
+
+        t.end();
+      });
+    });
+
+    test('When request is for a path matching a json file that didn\'t match and a module', (t) => {
+      request(`http://127.0.0.1:${port}/json/bar`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+          body,
+          "json/bar/index.js",
+          'should return expected body'
+        );
+
+        t.end();
+      });
+    });
+
+    test('When request is for a directory path matching a json file that matched and a module', (t) => {
+      request(`http://127.0.0.1:${port}/json/bar/`, { method: 'POST' }, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+          body,
+          "You got it!",
+          'should return expected body'
+        );
+
+        t.end();
+      });
+    });
+
+    test('When request is for a directory path matching a json file that didn\'t match and a module', (t) => {
+      request(`http://127.0.0.1:${port}/json/bar/`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+          body,
+          "json/bar/index.js",
+          'should return expected body'
+        );
+
+        t.end();
+      });
+    });
+
+    test('When request is for a module under a directory path matching a json file that doesn\'t match', (t) => {
+      request(`http://127.0.0.1:${port}/json/bar/index.js`, (err, res, body) => {
+        t.error(err, 'should not return an error');
+        t.ok(res, 'should return a response object');
+        t.equals(res.statusCode, 200, 'should return a status code of 200');
+        t.equals(
+          body,
+          "json/bar/index.js",
+          'should return expected body'
+        );
+
+        t.end();
+      });
     });
 
     test('When request is for a text file', (t) => {

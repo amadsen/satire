@@ -2,6 +2,13 @@
 
 Intelligent mocking (of http endpoints) with a purpose.
 
+## Quick Start
+
+1. Install as a devDependency: `npm install --save-dev satire`
+2. Add an npm script: `..."scripts": { ..."mocks": "satire" }`
+3. Put `.json` files in a `mocks/` subdirectory of your project. The relative filesystem path (from the `mocks/` subdirectory) of the `.json` file will be the URL path the of the mock.
+4. run `npm run mocks`.
+
 ## Install
 
 Satire is intended to be installed as a development dependency.
