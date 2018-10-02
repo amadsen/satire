@@ -10,7 +10,56 @@ const posixProjectPath = path.normalize(path.resolve(__dirname, '..'))
     .split(path.sep)
     .join(path.posix.sep);
 
-test('Testing command line interface', (suite) => {
+    test('Testing command line interface', (suite) => {
+        suite.test('loads through satire cli', (t) => {
+        const expectedStdout = 'Mock globs: [' +
+            '\n  "' + posixProjectPath + '/test/support/test-pkg-cfg/custom-mocks/**/*"' +
+            '\n]' +
+            '\nListening on 50001\n';
+        let stdout = '';
+        let listening = false;
+
+        const cp = spawn(
+            `${process.argv[0]}`,
+            [
+                '-r',
+                `${require.resolve('./support/child-exit.js')}`,
+                `${require.resolve('../cli/satire.js')}`
+            ],
+            {
+                env: {
+                    SATIRE_PORT: 50001
+                },
+                cwd: `${path.join(__dirname, './support/test-pkg-cfg/')}`,
+                stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+            }
+        );
+
+        cp.stdout.on('data', (data) => {
+            stdout += `${data}`;
+            if (!listening && /Listening\son\s\d+/.test(stdout)) {
+                listening = true
+                cp.emit('listening');
+            }
+        });
+
+        cp.on('listening', () => {
+            t.pass('Should report listening...');
+            // NOTE: using cp.kill() causes code coverage to be lost!
+            cp.send({ type: 'exit', exitCode: 0 });
+        });
+
+        cp.on('close', (code, signal) => {
+            t.equals(
+                stdout.slice(0, expectedStdout.length),
+                expectedStdout,
+                'Should report mock paths and port on stdout'
+            );
+
+            t.end();
+        });
+    });
+
     suite.test('loads through satire cli', (t) => {
         const expectedStdout = 'Mock globs: [' +
             '\n  "' + posixProjectPath + '/mocks/**/*",' +

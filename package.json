@@ -1,6 +1,6 @@
 {
   "name": "satire",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "Intelligent mocking with a purpose",
   "main": "index.js",
   "bin": {
@@ -17,25 +17,25 @@
   "author": "Aaron Madsen <amadsen@codifiant.com>",
   "license": "MIT",
   "devDependencies": {
-    "nyc": "^11.2.1",
-    "tape": "^4.6.3",
+    "nyc": "^11.9.0",
+    "tape": "^4.9.1",
     "tape-catch": "^1.0.6"
   },
   "dependencies": {
     "calling-file": "^1.0.0",
     "chokidar": "^1.7.0",
-    "configr8": "^1.0.0-alpha.7",
+    "configr8": "^1.0.0-alpha.13",
     "glob-parent": "^3.1.0",
-    "klaw": "^2.1.0",
+    "klaw": "^2.1.1",
     "may-require": "^1.0.0",
-    "micromatch": "^3.1.4",
-    "mime": "^2.0.3",
-    "request": "^2.83.0",
-    "stable": "^0.1.6",
-    "trike": "^1.0.0",
+    "micromatch": "^3.1.10",
+    "mime": "^2.3.1",
+    "request": "^2.88.0",
+    "stable": "^0.1.8",
+    "trike": "^1.1.2",
     "type-of": "^2.0.1",
     "unixify": "^1.0.0",
-    "uuid": "^3.1.0"
+    "uuid": "^3.3.2"
   },
   "directories": {
     "test": "test"
